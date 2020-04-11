@@ -114,17 +114,17 @@
     props: ["cellSize"],
     data: function() {
       return {
-        rows: 15,
-        cols: 15,
-        mines: 75,
+        rows: 16,
+        cols: 30,
+        mines: 99,
         loading: true,
         cells: [],
         won: false,
         lost: false,
         inputs: {
-          rows: 15,
-          cols: 15,
-          mines: 75
+          rows: 16,
+          cols: 30,
+          mines: 99
         }
       };
     },
@@ -271,20 +271,40 @@
           return;
         }
 
-        for (let i = -1; i <= 1; i++) {
-          if (cell.row + i < 0 || cell.row + i >= this.rows) {
-            continue;
+        let revealAdjacent = false;
+        if (cell.adjacentMines <= 1) {
+          let adjacentUnclicked = 0;
+          for (let i = -1; i <= 1; i++) {
+            if (cell.row + i < 0 || cell.row + i >= this.rows) {
+              continue;
+            }
+            for (let j = -1; j <= 1; j++) {
+              if (cell.col + j < 0 || cell.col + j >= this.cols) {
+                continue;
+              }
+              if (!this.cells[cell.row + i][cell.col + j].clicked) {
+                adjacentUnclicked += 1;
+              }
+            }
           }
-          if (!this.cells[cell.row + i][cell.col].isMine) {
-            this.onCellClicked(this.cells[cell.row + i][cell.col]);
-          }
+          revealAdjacent = cell.adjacentMines <= adjacentUnclicked;
         }
-        for (let i = -1; i <= 1; i++) {
-          if (cell.col + i < 0 || cell.col + i >= this.cols) {
-            continue;
+        if (revealAdjacent) {
+          for (let i = -1; i <= 1; i++) {
+            if (cell.row + i < 0 || cell.row + i >= this.rows) {
+              continue;
+            }
+            if (!this.cells[cell.row + i][cell.col].isMine) {
+              this.onCellClicked(this.cells[cell.row + i][cell.col]);
+            }
           }
-          if (!this.cells[cell.row][cell.col + i].isMine) {
-            this.onCellClicked(this.cells[cell.row][cell.col + i]);
+          for (let i = -1; i <= 1; i++) {
+            if (cell.col + i < 0 || cell.col + i >= this.cols) {
+              continue;
+            }
+            if (!this.cells[cell.row][cell.col + i].isMine) {
+              this.onCellClicked(this.cells[cell.row][cell.col + i]);
+            }
           }
         }
 
